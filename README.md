@@ -20,7 +20,7 @@ sklearn
 
 ## Datasets
 
-<p>We evaluate our method on three datasets: **Pokec-z**, **Pokec-n** and **Movielens-1M**. Raw data are uploaded or will be automatically downloaded to <code>./raw_data</code> folder. We have constructed graphs from the raw data and stored them in <code>./processed_data</code> folder in unified csv format for the model to load directly.</p>
+We evaluate our method on three datasets: **Pokec-z**, **Pokec-n** and **Movielens-1M**. Raw data are uploaded or will be automatically downloaded to <code>./raw_data</code> folder. We have constructed graphs from the raw data and stored them in <code>./processed_data</code> folder in unified csv format for the model to load directly.
 
 1. **Pokec-z** and **Pokec-n** are sampled from [soc_Pokec](http://snap.stanford.edu/data/soc-Pokec.html) following [FairGNN](https://github.com/EnyanDai/FairGNN). Raw and processed data have been already uploaded to <code>./raw_data</code> and <code>./processed_data</code> folders. 
 2. **Movielens-1M**'s [raw data](https://grouplens.org/datasets/movielens/1m/) is too large to hold on github, and it can be automatically downloaded to <code>./raw_data</code> folder and be processed to <code>./processed_data</code> folder when launching UGE training process. 

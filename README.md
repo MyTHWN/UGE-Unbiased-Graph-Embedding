@@ -44,22 +44,31 @@ We launch <code>run_graph_embedding.py</code> to firstly learn the node embeddin
 
 We support graph embedding models including **gcn, gat, sgc, sage, node2vec**. We support vanilla training without debiasing methods, and our debiasing methods including **UGE-W**, **UGE-R** and **UGE-C**.
 
-Below shows some command examples to run the code in different settings, and let us take dataset `pokec-z` with debiasing `gender` attribute as an example.
+Below shows some command examples to run the code in different settings, and let us use `gat` model on `pokec-z` dataset with debiasing `gender` attribute as an example.
 
-1. Vanilla training without debiasing: 
+1. Vanilla gat: training without debiasing.
 
 ```
 python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debias_method=none --debias_attr=none
 ```
 
-2. UGE-W: weighting-based debiasing, which first precomputes the edge weighting by sampling snippets from the graph and store the weights to `./precomputed_weights` folder, then training with reweighted loss.
+2. UGE-W: weighting-based debiasing, which first precomputes the edge weighting by sampling snippets from the graph and store the weights to `./precomputed_weights` folder, then trains with reweighted loss.
+
+```
+python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debias_method=uge-w --debias_attr=gender
+```
+
+4. UGE-R: regularization-based debiasing, which add a regularization term to the loss with weight 0.5.
+
+```
+python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debias_method=uge-r --debias_attr=gender --reg_weight=0.5
+```
+
+5. UGE-C: combining weighted and regularization based debiasing methods, with regularization weight 0.5.
 
 ```
 python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debias_method=uge-c --debias_attr=gender --reg_weight=0.5
 ```
-
-4. 
-
 
 
 ## Cite

@@ -15,22 +15,46 @@ import urllib.request
 import zipfile
 import pandas as pd
 import numpy as np
-import networkx as nx
 import os.path
 
+
+RAW_FOLDER = './raw_data'
+DATA_FOLDER = './processed_data'
+WEIGHT_FOLDER = './precomputed_weights'
+
+SENSITIVE_ATTR_DICT = {
+    'movielens': ['gender', 'occupation', 'age'],
+    'pokec': ['gender', 'region', 'AGE']
+}
+
+
 class MyDataset(DGLDataset):
-    def __init__(self, data_name):
+    def __init__(self, data_name, data_folder=DATA_FOLDER, weight_folder=WEIGHT_FOLDER, raw_folder=RAW_FOLDER):
         self.data_name = data_name
+        self.data_folder = data_folder
+        self.weight_folder = weight_folder
+        self.raw_folder = raw_folder
         super().__init__(name='customized_dataset')
 
     def process(self):
-        raw_folder = './raw_data'
-        processed_folder = './processed_data'
+        raw_folder = self.raw_folder
+        processed_folder = self.data_folder
+        weight_folder = self.weight_folder
         
         os.makedirs(raw_folder, exist_ok=True)
         os.makedirs(processed_folder, exist_ok=True)
         
-        edge_file = '{}/{}_edge.csv'.format(processed_folder, self.data_name) 
+        # !Key place to triger UGE-W
+        # - load edge (biased or reweighted) based on data_name
+        # - if data_name includes "debias", it means we are loading precomputed edge weights for uge-w
+        # - otherwise, we are loading original 0/1 edges
+        if 'debias' in self.data_name:  # e.g. self.data_name==movielens_debias_gender to trigger uge-w
+            edge_file = '{}/{}_edge.csv'.format(weight_folder, self.data_name)
+            print('Precomputed weights for weighting-based debiasing UGE-W Loaded')
+            
+        else:  # e.g. self.data_name==movielens without triggering uge-w
+            edge_file = '{}/{}_edge.csv'.format(processed_folder, self.data_name)
+        
         node_feat_file = '{}/{}_node_feature.csv'.format(processed_folder, self.data_name.split('_')[0])
         node_label_file = '{}/{}_node_label.csv'.format(processed_folder, self.data_name.split('_')[0])
         node_attribute_file = '{}/{}_node_attribute.csv'.format(processed_folder, self.data_name.split('_')[0])  # sensitive node attributes predefined to debias
@@ -43,7 +67,7 @@ class MyDataset(DGLDataset):
             elif self.data_name.split('_')[0].startswith('pokec'):
                 process_raw_pokec(raw_folder, processed_folder, self.data_name.split('_')[0])
             else:
-                raise FileNotFoundError('The dataset {} is not supported'.format(self.data_name.split('_')[0]))
+                raise AssertionError('The dataset {} is not supported'.format(self.data_name.split('_')[0]))
         
         ### create dgl graph from customized data ###
         
@@ -70,7 +94,8 @@ class MyDataset(DGLDataset):
         g = dgl.graph((edges_src, edges_dst), num_nodes=node_features.shape[0])
         g.ndata['feat'] = node_features
         g.ndata['label'] = node_labels
-        g.edata['weight'] = edge_features
+        # !Key place to triger UGE-W or not by data_name
+        g.edata['weight'] = edge_features if 'debias' in self.data_name else torch.ones_like(edge_features)
         
         
         # add sensitive attribute information to graph
@@ -90,18 +115,18 @@ class MyDataset(DGLDataset):
         # masks indicating whether a node belongs to training, validation, and test set.
         # ! We currently only target on link prediction task
         # ! this is a placeholder for node classification task
-        n_nodes = node_features.shape[0]
-        n_train = int(n_nodes * 0.6)
-        n_val = int(n_nodes * 0.2)
-        train_mask = torch.zeros(n_nodes, dtype=torch.bool)
-        val_mask = torch.zeros(n_nodes, dtype=torch.bool)
-        test_mask = torch.zeros(n_nodes, dtype=torch.bool)
-        train_mask[:n_train] = True
-        val_mask[n_train:n_train + n_val] = True
-        test_mask[n_train + n_val:] = True
-        self.graph.ndata['train_mask'] = train_mask
-        self.graph.ndata['val_mask'] = val_mask
-        self.graph.ndata['test_mask'] = test_mask
+        # n_nodes = node_features.shape[0]
+        # n_train = int(n_nodes * 0.6)
+        # n_val = int(n_nodes * 0.2)
+        # train_mask = torch.zeros(n_nodes, dtype=torch.bool)
+        # val_mask = torch.zeros(n_nodes, dtype=torch.bool)
+        # test_mask = torch.zeros(n_nodes, dtype=torch.bool)
+        # train_mask[:n_train] = True
+        # val_mask[n_train:n_train + n_val] = True
+        # test_mask[n_train + n_val:] = True
+        # self.graph.ndata['train_mask'] = train_mask
+        # self.graph.ndata['val_mask'] = val_mask
+        # self.graph.ndata['test_mask'] = test_mask
 
         print('Finished data loading and preprocessing.')
         print('  NumNodes: {}'.format(self.graph.number_of_nodes()))
@@ -154,7 +179,7 @@ def process_raw_movielens(raw_folder, processed_folder):
     "Horror",  "Musical",  "Mystery",  "Romance",  "Sci-Fi",
     "Thriller",  "War",  "Western"]
     
-    sensitive_attributes_predefined = ['gender', 'occupation', 'age']
+    sensitive_attributes_predefined = sensitive_attributes_predefined_dict['movielens']
     
     user_num = 6040
     item_num = 3952
@@ -230,7 +255,7 @@ def process_raw_pokec(raw_folder, processed_folder, data_name):
     feature_ls = ['Label', 'user_id', 'public', 
                   'completion_percentage', 'gender', 'region', 'AGE']
     
-    sensitive_attributes_predefined = ['gender', 'region', 'AGE']
+    sensitive_attributes_predefined = sensitive_attributes_predefined_dict['pokec']
 
     node_ids = list(nodes['user_id'])
     new_ids = list(range(len(node_ids)))

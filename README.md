@@ -26,12 +26,12 @@ We evaluate our method on three datasets: **Pokec-z**, **Pokec-n** and **Moviele
 2. **Movielens-1M**'s [raw data](https://grouplens.org/datasets/movielens/1m/) is too large to hold on github, and it can be automatically downloaded to <code>./raw_data</code> folder and be processed to <code>./processed_data</code> folder when launching UGE training process. 
 
 We predefine the sensitive attributes to debias as follows, which is specified in <code>data_loader.py</code>
-
+```
   SENSITIVE_ATTR_DICT = {
     'movielens': ['gender', 'occupation', 'age'],
     'pokec': ['gender', 'region', 'AGE']
   }
-
+```
 
 
 <p>To include and customize your own data, please refer to <code>data_loader.py</code>.</p>

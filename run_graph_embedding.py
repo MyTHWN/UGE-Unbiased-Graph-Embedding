@@ -26,13 +26,14 @@ from sklearn.metrics import roc_auc_score
 import dgl.data
 
 from graph_models import GCN, GAT, SGC, GraphSAGE, Node2vec
-from create_dataset import MyDataset
 from predictors import DotLinkPredictor, MLPLinkPredictor
 from utils import compute_bpr_loss, compute_entropy_loss, compute_metric, construct_link_prediction_data_by_node
 
-from create_dataset import SENSITIVE_ATTR_DICT  # predefined sensitive attributes for different datasets
-from create_dataset import DATA_FOLDER
+from data_loader import MyDataset
+from data_loader import SENSITIVE_ATTR_DICT  # predefined sensitive attributes for different datasets
+from data_loader import DATA_FOLDER
 
+from evaluate import eval_unbiasedness_pokec, eval_unbiasedness_movielens
 
 def setup_seed(seed):
     torch.manual_seed(seed)
@@ -45,10 +46,10 @@ def setup_seed(seed):
 def arg_parse():
     parser = argparse.ArgumentParser(description='UGE')
     
-    parser.add_argument('--dataset', type=str, default='movielens') 
+    parser.add_argument('--dataset', type=str, default='pokec-z', choices=['movielens', 'pokec-z', 'pokec-n']) 
     parser.add_argument('--model', type=str, default='sage', choices=['gcn', 'gat', 'sgc', 'sage', 'node2vec'], help='gcn model')
     parser.add_argument('--debias_method', type=str, default='none', choices=['uge-r', 'uge-w', 'uge-c', 'none'], help='debiasing method to apply')
-    parser.add_argument('--sensitive_attr', type=str, default='none', help='sensitive attribute to be debiased')
+    parser.add_argument('--debias_attr', type=str, default='none', help='sensitive attribute to be debiased')
     parser.add_argument('--reg_weight', type=float, default=0.1, help='weight for the regularization based debiasing term')  
     
     parser.add_argument('--loss', type=str, default='entropy', choices=['entropy', 'bpr'], help='loss function')
@@ -66,26 +67,26 @@ def arg_parse():
 
 
 # check and set config for valid debiasing method
-def config_debias(debias_method, sensitive_attr, dataset):
-    # make sure sensitive_attr is supported by the predefined attr list
-    if (debias_method != 'none') and (sensitive_attr not in SENSITIVE_ATTR_DICT[dataset]):
-        if sensitive_attr == 'none':
+def config_debias(debias_method, debias_attr, dataset):
+    # make sure debias_attr is supported by the predefined attr list
+    if (debias_method != 'none') and (debias_attr not in SENSITIVE_ATTR_DICT[dataset]):
+        if debias_attr == 'none':
             raise AssertionError('Please specify sensitive attribute for {} to debias'.format(debias_method))
         else:
-            raise AssertionError('{} is not a predefined sensitive attr for {} dataset'.format(sensitive_attr, dataset))
+            raise AssertionError('{} is not a predefined sensitive attr for {} dataset'.format(debias_attr, dataset))
         
-    # if no debiasing, set sensitive_attr to none
+    # if no debiasing, set debias_attr to none
     if debias_method == 'none':
-        if sensitive_attr != 'none':
-            warnings.warn('no debias method specified, sensitive_attr will be reset as none')
-            sensitive_attr = 'none'
+        if debias_attr != 'none':
+            warnings.warn('no debias method specified, debias_attr will be reset as none')
+            debias_attr = 'none'
     
     # if weighting-based debiasing (uge-w/uge-c) is activated
     # change the data_name to load the precomputed edge weights when loading dataset
     if debias_method in ['uge-w', 'uge-c']:
-        dataset = '{}_debias_{}'.format(dataset, sensitive_attr)
+        dataset = '{}_debias_{}'.format(dataset, debias_attr)
         
-    return debias_method, sensitive_attr, dataset
+    return debias_method, debias_attr, dataset
         
     
 def learn_embeddings(args):
@@ -99,7 +100,7 @@ def learn_embeddings(args):
     print ('  pytorch version: ', torch.__version__)
     
     # check if the parsed debiasing arguments are valid; config debiasing env
-    debias_method, sensitive_attr, data_name = config_debias(args.debias_method, args.sensitive_attr, args.dataset)
+    debias_method, debias_attr, data_name = config_debias(args.debias_method, args.debias_attr, args.dataset)
     
     ######################################################################
     # load and construct data for link prediction task
@@ -159,8 +160,8 @@ def learn_embeddings(args):
         
         attribute_list = SENSITIVE_ATTR_DICT[args.dataset]
         
-        non_sens_attr_ls = [attr for attr in attribute_list if attr!=sensitive_attr]
-        non_sens_attr_idx = [i for i in range(len(attribute_list)) if attribute_list[i]!=sensitive_attr]
+        non_sens_attr_ls = [attr for attr in attribute_list if attr!=debias_attr]
+        non_sens_attr_idx = [i for i in range(len(attribute_list)) if attribute_list[i]!=debias_attr]
 
         attribute_file = '{}/{}_node_attribute.csv'.format(DATA_FOLDER, args.dataset)
         node_attributes = pd.read_csv(attribute_file)
@@ -256,9 +257,9 @@ def learn_embeddings(args):
         dur.append(time.time() - cur)
         cur = time.time()
 
-        if e % 20 == 0:
+        if e % 20 == 20:
             # evaluation on test set
-            print ('evaluating at epoch {}...'.format(e))
+            # print ('evaluating at epoch {}...'.format(e))
             
             model.eval()
             
@@ -268,31 +269,47 @@ def learn_embeddings(args):
                 test_auc, test_ndcg = compute_metric(test_pos_score, test_neg_score)
                 train_auc, train_ndcg = compute_metric(train_pos_score, train_neg_score)
 
-            print("Epoch {:05d} | Loss {:.4f} | Train AUC {:.4f} | Train NDCG {:.4f} | Test AUC {:.4f} | Test NDCG {:.4f} | Time {:.4f}".format(
+            print("-- Epoch {:05d} | Loss {:.4f} | Train AUC {:.4f} | Train NDCG {:.4f} | Test AUC {:.4f} | Test NDCG {:.4f} | Time {:.4f}".format(
                   e, loss.item(), train_auc, train_ndcg, test_auc, test_ndcg, dur[-1]))
 
-            # Save learned embedding dynamically
-            embeddings = h.detach().cpu().numpy()
-            
-            if debias_method == 'none':
-                path = '{}/{}_{}_{}_{}_{}_embedding.bin'.format(
-                    args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs)
-            elif debias_method == 'uge-w':
-                path = '{}/{}_{}_{}_{}_{}_{}_{}.bin'.format(
-                    args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs,
-                    debias_method, sensitive_attr)
-            else:
-                path = '{}/{}_{}_{}_{}_{}_{}_{}_{}.bin'.format(
-                    args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs,
-                    debias_method, sensitive_attr, str(args.reg_weight))
+        # Save learned embedding dynamically
+        embeddings = h.detach().cpu().numpy()
 
-            os.makedirs(args.out_dir, exist_ok=True)
-            with open(path, "wb") as output_file:
-                pkl.dump(embeddings, output_file)
-            print ('==== intermediate embeddings with shape {} is saved to {} ===='.format(embeddings.shape, path))
+        os.makedirs(args.out_dir, exist_ok=True)
+
+        if debias_method == 'none':
+            path = '{}/{}_{}_{}_{}_{}_embedding.bin'.format(
+                args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs)
+        elif debias_method == 'uge-w':
+            path = '{}/{}_{}_{}_{}_{}_{}_{}.bin'.format(
+                args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs,
+                debias_method, debias_attr)
+        else:
+            path = '{}/{}_{}_{}_{}_{}_{}_{}_{}.bin'.format(
+                args.out_dir, args.dataset, args.model, args.loss, str(args.lr), args.epochs,
+                debias_method, debias_attr, str(args.reg_weight))
+
+        with open(path, "wb") as output_file:
+            pkl.dump(embeddings, output_file)
+    
+    print ('-- embeddings with shape {} is saved to {}'.format(embeddings.shape, path))
+            
+    return path
+    
+
+def eval_embeddings(args, out_embed_path):
+    print ('==== Evaluate {} debias method on {} ===='.format(args.debias_method, args.debias_attr))
+    
+    if args.dataset == 'movielens':
+        eval_unbiasedness_movielens(args.dataset, out_embed_path)
+    else: # pokec
+        eval_unbiasedness_pokec(args.dataset, out_embed_path)
         
         
 if __name__ == '__main__':
 
     args = arg_parse()
-    learn_embeddings(args)
+    out_embed_path = learn_embeddings(args)
+    
+    # evaluate unbiasedness
+    results = eval_embeddings(args, out_embed_path)

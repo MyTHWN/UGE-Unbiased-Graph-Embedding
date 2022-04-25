@@ -12,7 +12,23 @@ import tqdm
 from collections import defaultdict
 
 from sklearn.metrics import roc_auc_score, ndcg_score, f1_score, accuracy_score, recall_score
-from create_dataset import MyDataset
+from data_loader import MyDataset
+
+
+def dcg_at_k(r, k):
+    r = np.asfarray(r)[:k]
+    if r.size != k:
+        raise ValueError('Ranking List length < k')    
+    return np.sum((2**r - 1) / np.log2(np.arange(2, r.size + 2)))
+
+
+def ndcg_at_k(r, k):
+    sort_r = sorted(r,reverse = True)
+    idcg = dcg_at_k(sort_r, k)
+    if not idcg:
+        print('.', end=' ')
+        return 0.
+    return dcg_at_k(r, k) / idcg
 
 
 def compute_bpr_loss(pos_score, neg_score, pos_weights):

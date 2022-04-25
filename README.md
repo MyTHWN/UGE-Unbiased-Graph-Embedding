@@ -29,8 +29,8 @@ We predefine the **sensitive attributes** to debias as follows, which is specifi
 ```
   SENSITIVE_ATTR_DICT = {
     'movielens': ['gender', 'occupation', 'age'],
-    'pokec-z': ['gender', 'region', 'AGE'],
-    'pokec-n': ['gender', 'region', 'AGE']
+    'pokec-z': ['gender', 'region', 'age'],
+    'pokec-n': ['gender', 'region', 'age']
 }
 ```
 

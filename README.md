@@ -8,14 +8,13 @@ This is the code for paper "Unbiased Graph Embedding with Biased Graph Observati
 Code is tested in Python 3.8 and PyTorch 1.8~1.11. Some major requirements are listed below:
 
 ```
-torch
-dgl
-pandas
-numpy
-scipy
-tqdm
-pickle
-sklearn
+torch~=1.11.0
+dgl~=0.8.1
+pandas~=1.4.2
+numpy~=1.22.2
+scipy~=1.8.0
+tqdm~=4.64.0
+sklearn~=1.0.2
 ```
 
 ## Datasets

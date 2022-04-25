@@ -38,7 +38,7 @@ We predefine the **sensitive attributes** to debias as follows, which is specifi
 
 <p>To include and customize your own data, please refer to <code>data_loader.py</code>.</p>
 
-## Run the UGE Code
+## Run the Code
 
 We launch <code>run_graph_embedding.py</code> to firstly learn the node embeddings and store the array in `./embeddings` folder, then evaluate the **utility** (ndcg on link prediction), **unbiasedness** (micro-f1 on sensitive attribute prediction) and **fairnss** (EO/DP) of learned embeddings.
 
@@ -70,15 +70,20 @@ python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debia
 python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debias_method=uge-c --debias_attr=gender --reg_weight=0.5
 ```
 
+## Misc
+
+**Seperate Embedding learning and Evaluation**: `./evaluate.py` also supports evaluating multiple embedding files under a folder. You can first obtain a bounch of embeddings with different hyperparameters under a folder, and run `./evaluate.py` to calculate and store all the metrics into file on these embeddings.
+
+**Random baseline**: directly calling `eval_unbiasedness_pokec(data_name, embed_file=None)` or `eval_unbiasedness_movielens(data_name, embed_file=None)` with setting ` embed_file=None` in `./evaluate.py` will not load existing learned embeddings but calculate the metrics of random generated embeddings.
 
 ## Cite
 
 Please cite our paper if you are inspired by our work.
 > @article{wang2021unbiased,<br>
->  title={Unbiased Graph Embedding with Biased Graph Observations},<br>
->  author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},<br>
->  journal={arXiv preprint arXiv:2110.13957},<br>
->  year={2021}<br>
+>   title={Unbiased Graph Embedding with Biased Graph Observations},<br>
+>   author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},<br>
+>   journal={arXiv preprint arXiv:2110.13957},<br>
+>   year={2021}<br>
 }
 
 

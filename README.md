@@ -79,6 +79,8 @@ python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debia
 ## Cite
 
 Please cite our paper if you find this repo useful for your research or development.
+
+arXiv:
 ```
 @article{wang2021unbiased,
   title={Unbiased Graph Embedding with Biased Graph Observations},
@@ -87,6 +89,7 @@ Please cite our paper if you find this repo useful for your research or developm
   year={2021}
 }
 ```
+Proceedings of the ACM Web Conference 2022:
 ```
 @inproceedings{wang2022unbiased,
   author = {Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},

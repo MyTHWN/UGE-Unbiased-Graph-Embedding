@@ -80,30 +80,30 @@ python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debia
 
 Please cite our paper if you find this repo useful for your research or development.
 ```
-    @article{wang2021unbiased,
-      title={Unbiased Graph Embedding with Biased Graph Observations},
-      author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
-      journal={arXiv preprint arXiv:2110.13957},
-      year={2021}
-    }
+@article{wang2021unbiased,
+  title={Unbiased Graph Embedding with Biased Graph Observations},
+  author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
+  journal={arXiv preprint arXiv:2110.13957},
+  year={2021}
+}
 ```
 ```
-    @inproceedings{wang2022unbiased,
-      author = {Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
-      title = {Unbiased Graph Embedding with Biased Graph Observations},
-      year = {2022},
-      isbn = {9781450390965},
-      publisher = {Association for Computing Machinery},
-      address = {New York, NY, USA},
-      url = {https://doi.org/10.1145/3485447.3512189},
-      doi = {10.1145/3485447.3512189},
-      booktitle = {Proceedings of the ACM Web Conference 2022},
-      pages = {1423–1433},
-      numpages = {11},
-      keywords = {sensitive attributes, bias-free graph, unbiased graph embedding},
-      location = {Virtual Event, Lyon, France},
-      series = {WWW '22}
-    }
+@inproceedings{wang2022unbiased,
+  author = {Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
+  title = {Unbiased Graph Embedding with Biased Graph Observations},
+  year = {2022},
+  isbn = {9781450390965},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3485447.3512189},
+  doi = {10.1145/3485447.3512189},
+  booktitle = {Proceedings of the ACM Web Conference 2022},
+  pages = {1423–1433},
+  numpages = {11},
+  keywords = {sensitive attributes, bias-free graph, unbiased graph embedding},
+  location = {Virtual Event, Lyon, France},
+  series = {WWW '22}
+}
 ```
 
 

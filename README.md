@@ -40,9 +40,9 @@ We predefine the **sensitive attributes** to debias as follows, which is specifi
 
 ## Run the Code
 
-We launch <code>run_graph_embedding.py</code> to firstly learn the node embeddings and store the array in `./embeddings` folder, then evaluate the **utility** (ndcg on link prediction), **unbiasedness** (micro-f1 on sensitive attribute prediction) and **fairnss** (EO/DP) of learned embeddings.
-
 We support graph embedding models including **gcn, gat, sgc, sage, node2vec**. We support our proposed debiasing methods including **UGE-W** (weighting based), **UGE-R** (regularization based) and **UGE-C** (combined), as well as vanilla training without debiasing.
+
+We launch <code>run_graph_embedding.py</code> to firstly learn the node embeddings and store the array in `./embeddings` folder, then evaluate the **utility** (ndcg on link prediction), **unbiasedness** (micro-f1 on sensitive attribute prediction) and **fairnss** (EO/DP) of learned embeddings.
 
 Below shows some command examples to run the code in different settings, and let us use `gat` model on `pokec-z` dataset with debiasing `gender` attribute as an example.
 
@@ -79,31 +79,33 @@ python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debia
 ## Cite
 
 Please cite our paper if you find this repo useful for your research or development.
-> @article{wang2021unbiased,<br>
->   title={Unbiased Graph Embedding with Biased Graph Observations},<br>
->   author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},<br>
->   journal={arXiv preprint arXiv:2110.13957},<br>
->   year={2021}<br>
-}
+```
+    @article{wang2021unbiased,
+      title={Unbiased Graph Embedding with Biased Graph Observations},
+      author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
+      journal={arXiv preprint arXiv:2110.13957},
+      year={2021}
+    }
+```
+```
+    @inproceedings{wang2022unbiased,
+      author = {Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
+      title = {Unbiased Graph Embedding with Biased Graph Observations},
+      year = {2022},
+      isbn = {9781450390965},
+      publisher = {Association for Computing Machinery},
+      address = {New York, NY, USA},
+      url = {https://doi.org/10.1145/3485447.3512189},
+      doi = {10.1145/3485447.3512189},
+      booktitle = {Proceedings of the ACM Web Conference 2022},
+      pages = {1423–1433},
+      numpages = {11},
+      keywords = {sensitive attributes, bias-free graph, unbiased graph embedding},
+      location = {Virtual Event, Lyon, France},
+      series = {WWW '22}
+    }
+```
 
-'''
-@inproceedings{10.1145/3485447.3512189,
-author = {Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
-title = {Unbiased Graph Embedding with Biased Graph Observations},
-year = {2022},
-isbn = {9781450390965},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3485447.3512189},
-doi = {10.1145/3485447.3512189},
-booktitle = {Proceedings of the ACM Web Conference 2022},
-pages = {1423–1433},
-numpages = {11},
-keywords = {sensitive attributes, bias-free graph, unbiased graph embedding},
-location = {Virtual Event, Lyon, France},
-series = {WWW '22}
-}
-'''
 
 
 

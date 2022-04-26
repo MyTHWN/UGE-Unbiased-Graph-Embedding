@@ -28,10 +28,10 @@ We include three datasets: **Pokec-z**, **Pokec-n** and **Movielens-1M**. Raw da
 We predefine the **sensitive attributes** to debias as follows, which is specified in <code>data_loader.py</code>.
 
 ```
-  SENSITIVE_ATTR_DICT = {
-    'movielens': ['gender', 'occupation', 'age'],
-    'pokec-z': ['gender', 'region', 'age'],
-    'pokec-n': ['gender', 'region', 'age']
+SENSITIVE_ATTR_DICT = {
+  'movielens': ['gender', 'occupation', 'age'],
+  'pokec-z': ['gender', 'region', 'age'],
+  'pokec-n': ['gender', 'region', 'age']
 }
 ```
 

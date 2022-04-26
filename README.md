@@ -41,7 +41,7 @@ We predefine the **sensitive attributes** to debias as follows, which is specifi
 
 We launch <code>run_graph_embedding.py</code> to firstly learn the node embeddings and store the array in `./embeddings` folder, then evaluate the **utility** (ndcg on link prediction), **unbiasedness** (micro-f1 on sensitive attribute prediction) and **fairnss** (EO/DP) of learned embeddings.
 
-We support graph embedding models including **gcn, gat, sgc, sage, node2vec**. We support vanilla training without debiasing methods, and our debiasing methods including **UGE-W**, **UGE-R** and **UGE-C**.
+We support graph embedding models including **gcn, gat, sgc, sage, node2vec**. We support our proposed debiasing methods including **UGE-W** (weighting based), **UGE-R** (regularization based) and **UGE-C** (combined), as well as vanilla training without debiasing.
 
 Below shows some command examples to run the code in different settings, and let us use `gat` model on `pokec-z` dataset with debiasing `gender` attribute as an example.
 

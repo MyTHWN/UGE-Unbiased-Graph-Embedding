@@ -87,15 +87,6 @@ python run_graph_embedding.py --epochs=800 --dataset=pokec-z --model=gat --debia
 
 Please cite our paper if you find this repo useful for your research or development.
 
-arXiv:
-```
-@article{wang2021unbiased,
-  title={Unbiased Graph Embedding with Biased Graph Observations},
-  author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
-  journal={arXiv preprint arXiv:2110.13957},
-  year={2021}
-}
-```
 Proceedings of the ACM Web Conference 2022:
 ```
 @inproceedings{wang2022unbiased,
@@ -113,6 +104,16 @@ Proceedings of the ACM Web Conference 2022:
   keywords = {sensitive attributes, bias-free graph, unbiased graph embedding},
   location = {Virtual Event, Lyon, France},
   series = {WWW '22}
+}
+```
+
+arXiv:
+```
+@article{wang2021unbiased,
+  title={Unbiased Graph Embedding with Biased Graph Observations},
+  author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
+  journal={arXiv preprint arXiv:2110.13957},
+  year={2021}
 }
 ```
 

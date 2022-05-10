@@ -107,15 +107,6 @@ Proceedings of the ACM Web Conference 2022:
 }
 ```
 
-arXiv:
-```
-@article{wang2021unbiased,
-  title={Unbiased Graph Embedding with Biased Graph Observations},
-  author={Wang, Nan and Lin, Lu and Li, Jundong and Wang, Hongning},
-  journal={arXiv preprint arXiv:2110.13957},
-  year={2021}
-}
-```
 
 
 

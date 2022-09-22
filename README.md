@@ -1,7 +1,7 @@
 
 # UGE-Unbiased-Graph-Embedding
 
-This is the code for the paper "Unbiased Graph Embedding with Biased Graph Observations" accepted by WWW'22.
+This is the code for the paper "[Unbiased Graph Embedding with Biased Graph Observations](https://dl.acm.org/doi/10.1145/3485447.3512189)" accepted by WWW'22.
 
 
 ## Introduction
